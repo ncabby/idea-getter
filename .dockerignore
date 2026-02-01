@@ -1,0 +1,50 @@
+# Dependencies
+node_modules
+
+# Build output (will be rebuilt in container)
+dist
+
+# Development files
+.env
+.env.*
+!.env.example
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test files
+*.test.ts
+*.spec.ts
+__tests__
+coverage
+
+# Documentation
+*.md
+!README.md
+
+# Docker files (no need to copy these into the container)
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# App Runner config
+apprunner.yaml
+
+# Temporary files
+tmp
+temp

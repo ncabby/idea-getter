@@ -23,6 +23,7 @@ import cors from 'cors';
 import opportunitiesRouter from './opportunities.js';
 import settingsRouter from './settings.js';
 import statusRouter from './status.js';
+import healthRouter from './health.js';
 import dashboardRouter from '../dashboard/index.js';
 import { errorHandler, notFoundHandler, requestLogger } from './middleware.js';
 
@@ -81,6 +82,9 @@ export function createApp(options: { enableCors?: boolean; enableLogging?: boole
   if (enableLogging) {
     app.use(requestLogger);
   }
+
+  // Mount health check endpoint (at root level for AWS App Runner)
+  app.use('/health', healthRouter);
 
   // Mount API routes
   app.use('/api', createApiRouter());

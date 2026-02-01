@@ -1,0 +1,26 @@
+version: 1.0
+runtime: nodejs20
+build:
+  commands:
+    build:
+      - npm ci --production=false
+      - npm run build
+      - npm run db:migrate:prod
+      - npm run db:seed:prod
+run:
+  command: npm start
+  network:
+    port: 3000
+    env: PORT
+  env:
+    - name: NODE_ENV
+      value: "production"
+    # DATABASE_URL must be configured in App Runner console or via AWS CLI
+    # - name: DATABASE_URL
+    #   value: "postgresql://user:password@host:5432/idea_getter"
+    # ANTHROPIC_API_KEY must be configured in App Runner console or via AWS CLI
+    # - name: ANTHROPIC_API_KEY
+    #   value: "sk-ant-..."
+    # OPENAI_API_KEY must be configured in App Runner console or via AWS CLI
+    # - name: OPENAI_API_KEY
+    #   value: "sk-..."

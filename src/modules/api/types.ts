@@ -114,6 +114,14 @@ export interface StatusResponse {
 }
 
 /**
+ * Response for GET /health
+ */
+export interface HealthResponse {
+  status: 'healthy' | 'unhealthy';
+  database: 'connected' | 'disconnected';
+}
+
+/**
  * Standard error response
  */
 export interface ErrorResponse {
