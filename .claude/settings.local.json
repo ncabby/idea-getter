@@ -14,7 +14,8 @@
       "Bash(curl:*)",
       "Bash(git add:*)",
       "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd job scheduler and daily pipeline orchestration\n\nImplements automated daily pipeline execution at 2 AM UTC using node-cron:\n- PipelineOrchestrator runs 6-step pipeline \\(scrape → detect → embed → cluster → score → cleanup\\)\n- CleanupService archives data older than 30 days\n- Missed run detection executes immediately on startup if no run today\n- Duplicate prevention via in-memory state and database checks\n- 2-hour timeout protection and graceful shutdown support\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
-      "Bash(node --import tsx -e:*)"
+      "Bash(node --import tsx -e:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd AWS deployment infrastructure with App Runner and Docker support\n\n- Add health check endpoint \\(GET /health\\) for load balancer monitoring\n- Create apprunner.yaml for AWS App Runner source-based deployment\n- Add Dockerfile with multi-stage build for containerized deployment\n- Add production scripts \\(start:prod, db:migrate:prod, db:seed:prod\\)\n- Add .dockerignore to optimize container builds\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
     ]
   }
 }
