@@ -8,6 +8,13 @@
       "when": 1769822595057,
       "tag": "0000_puzzling_annihilus",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1769822700000,
+      "tag": "0001_rename_subreddit_to_category",
+      "breakpoints": true
     }
   ]
 }

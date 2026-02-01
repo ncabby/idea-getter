@@ -39,17 +39,17 @@ const vector = customType<{
 // COMPLAINTS TABLE
 // =============================================================================
 /**
- * Stores raw scraped content from Reddit.
- * Each record represents a single post or comment that may be a user complaint.
+ * Stores raw scraped content from Hacker News.
+ * Each record represents a single story or comment that may be a user complaint.
  */
 export const complaints = pgTable(
   'complaints',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    sourcePlatform: varchar('source_platform', { length: 50 }).notNull().default('reddit'),
+    sourcePlatform: varchar('source_platform', { length: 50 }).notNull().default('hackernews'),
     sourceId: varchar('source_id', { length: 255 }).notNull(),
     sourceUrl: text('source_url').notNull(),
-    subreddit: varchar('subreddit', { length: 100 }).notNull(),
+    category: varchar('category', { length: 100 }).notNull(),
     author: varchar('author', { length: 100 }).notNull(),
     text: text('text').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull(),

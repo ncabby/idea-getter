@@ -6,25 +6,11 @@ import { settings } from './schema.js';
 const { Pool } = pg;
 
 /**
- * Default monitored subreddits for the Idea Getter MVP
- * These are startup/indie hacker focused communities where users
- * frequently discuss pain points and product opportunities.
+ * Default monitored HN categories for the Idea Getter MVP
+ * - ask: Ask HN posts contain questions and discussions about pain points
+ * - show: Show HN posts often include feedback and feature requests
  */
-const MONITORED_SUBREDDITS = [
-  'r/indiehackers',
-  'r/SaaS',
-  'r/startups',
-  'r/Entrepreneur',
-  'r/smallbusiness',
-  'r/sideproject',
-  'r/microsaas',
-  'r/advancedentrepreneur',
-  'r/EntrepreneurRideAlong',
-  'r/webdev',
-  'r/programming',
-  'r/selfhosted',
-  'r/ProductManagement',
-];
+const MONITORED_CATEGORIES = ['ask', 'show'];
 
 /**
  * Default settings for the Idea Getter system
@@ -41,9 +27,9 @@ const DEFAULT_SETTINGS = [
     description: 'Minimum number of complaints required for a cluster to become an opportunity.',
   },
   {
-    key: 'monitored_subreddits',
-    value: MONITORED_SUBREDDITS,
-    description: 'List of subreddits to monitor for user complaints and pain points.',
+    key: 'monitored_categories',
+    value: MONITORED_CATEGORIES,
+    description: 'List of HN categories to monitor for user complaints and pain points (ask, show, top, new).',
   },
   {
     key: 'similarity_threshold',
@@ -57,13 +43,13 @@ const DEFAULT_SETTINGS = [
   },
   {
     key: 'scrape_lookback_days',
-    value: 7,
-    description: 'Number of days to look back when scraping new content from Reddit.',
+    value: 30,
+    description: 'Number of days to look back when scraping new content from Hacker News.',
   },
   {
-    key: 'max_items_per_subreddit',
+    key: 'max_items_per_category',
     value: 100,
-    description: 'Maximum number of items to scrape per subreddit per run.',
+    description: 'Maximum number of items to scrape per HN category per run.',
   },
   {
     key: 'embedding_batch_size',
@@ -114,8 +100,8 @@ async function seedSettings() {
     console.log(`  - Minimum complaint count: 10`);
     console.log(`  - Similarity threshold: 0.75`);
     console.log(`  - Data retention: 30 days`);
-    console.log(`  - Monitored subreddits: ${MONITORED_SUBREDDITS.length}`);
-    MONITORED_SUBREDDITS.forEach((sub) => console.log(`    - ${sub}`));
+    console.log(`  - Monitored categories: ${MONITORED_CATEGORIES.length}`);
+    MONITORED_CATEGORIES.forEach((cat) => console.log(`    - ${cat}`));
   } catch (error) {
     console.error('Seeding failed:', error);
     throw error;
