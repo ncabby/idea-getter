@@ -1,57 +1,88 @@
 import type { Request, Response, NextFunction } from 'express';
-import { ApiError, InternalServerError, type ErrorResponse } from './types.js';
+import { ApiError } from './types.js';
+
+/**
+ * Check if the request is for an API endpoint
+ */
+function isApiRequest(req: Request): boolean {
+  return req.path.startsWith('/api/');
+}
 
 /**
  * Global error handling middleware.
  *
  * Catches all errors and returns proper HTTP responses with consistent format.
+ * Returns JSON for API requests and renders error page for dashboard requests.
  * Logs errors to console (can be replaced with Winston or other logger).
  */
 export function errorHandler(
   err: Error,
-  _req: Request,
-  res: Response<ErrorResponse>,
+  req: Request,
+  res: Response,
   _next: NextFunction
 ): void {
   // Log the error
-  console.error('[API Error]', {
+  console.error('[Error]', {
     name: err.name,
     message: err.message,
     stack: err.stack,
+    path: req.path,
     timestamp: new Date().toISOString(),
   });
 
-  // Handle known API errors
+  // Determine status code and message
+  let statusCode = 500;
+  let errorTitle = 'Internal Server Error';
+  let errorMessage = process.env.NODE_ENV === 'production'
+    ? 'An unexpected error occurred'
+    : err.message;
+
   if (err instanceof ApiError) {
-    res.status(err.statusCode).json(err.toJSON());
-    return;
+    statusCode = err.statusCode;
+    errorTitle = err.error;
+    errorMessage = err.message;
+  } else if (err.name === 'ZodError') {
+    statusCode = 400;
+    errorTitle = 'Bad Request';
+    errorMessage = 'Validation error: ' + err.message;
   }
 
-  // Handle Zod validation errors
-  if (err.name === 'ZodError') {
-    res.status(400).json({
-      error: 'Bad Request',
-      message: 'Validation error: ' + err.message,
+  // Return JSON for API requests
+  if (isApiRequest(req)) {
+    res.status(statusCode).json({
+      error: errorTitle,
+      message: errorMessage,
     });
     return;
   }
 
-  // Handle unknown errors as 500 Internal Server Error
-  const internalError = new InternalServerError(
-    process.env.NODE_ENV === 'production'
-      ? 'Internal server error'
-      : err.message
-  );
-  res.status(internalError.statusCode).json(internalError.toJSON());
+  // Render error page for dashboard requests
+  res.status(statusCode).render('error', {
+    title: errorTitle,
+    message: errorMessage,
+  });
 }
 
 /**
  * 404 Not Found handler for undefined routes.
+ * Returns JSON for API requests and renders error page for dashboard requests.
  */
-export function notFoundHandler(req: Request, res: Response<ErrorResponse>): void {
-  res.status(404).json({
-    error: 'Not Found',
-    message: `Route ${req.method} ${req.path} not found`,
+export function notFoundHandler(req: Request, res: Response): void {
+  const message = `Route ${req.method} ${req.path} not found`;
+
+  // Return JSON for API requests
+  if (isApiRequest(req)) {
+    res.status(404).json({
+      error: 'Not Found',
+      message,
+    });
+    return;
+  }
+
+  // Render error page for dashboard requests
+  res.status(404).render('error', {
+    title: 'Page Not Found',
+    message: 'The page you are looking for does not exist.',
   });
 }
 

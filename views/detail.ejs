@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <!-- Header with System Status -->
+  <header class="header">
+    <div class="header-container">
+      <div class="header-top">
+        <a href="/" class="header-title">Idea Getter</a>
+        <button class="settings-button" id="settings-button" aria-label="Settings">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="status-bar">
+        <span class="status-item <%= stats.lastUpdatedStale ? 'status-stale' : '' %>">
+          Last updated: <%= stats.lastUpdated %>
+        </span>
+        <span class="status-item"><%= stats.complaintsAnalyzed.toLocaleString() %> complaints analyzed</span>
+        <span class="status-item"><%= stats.opportunitiesFound %> opportunities found</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="container">
+      <!-- Back Navigation -->
+      <nav class="back-nav">
+        <a href="/" class="back-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Back to Dashboard
+        </a>
+      </nav>
+
+      <!-- Detail Container -->
+      <div class="detail-container">
+        <!-- Detail Header -->
+        <div class="detail-header">
+          <div class="detail-title-row">
+            <h1 class="problem-title"><%= opportunity.summary %></h1>
+            <div class="header-actions">
+              <span class="score-badge score-badge-large">Score: <%= opportunity.score %></span>
+              <button
+                class="bookmark-button bookmark-button-large <%= opportunity.isBookmarked ? 'bookmarked' : '' %>"
+                id="detail-bookmark"
+                data-id="<%= opportunity.id %>"
+                data-bookmarked="<%= opportunity.isBookmarked %>"
+                aria-label="<%= opportunity.isBookmarked ? 'Remove bookmark' : 'Add bookmark' %>"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="<%= opportunity.isBookmarked ? 'currentColor' : 'none' %>" stroke="currentColor" stroke-width="2">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="detail-metadata">
+            <%= opportunity.complaintCount %> total complaints
+            <span class="metadata-divider">|</span>
+            First detected: <%= opportunity.firstSeen %>
+            <span class="metadata-divider">|</span>
+            Last seen: <%= opportunity.lastSeen %>
+          </div>
+        </div>
+
+        <!-- Category Breakdown Section -->
+        <section class="section">
+          <h2 class="section-title">Category Breakdown</h2>
+          <div class="platform-breakdown">
+            <% platformBreakdown.forEach(function(platform) { %>
+              <div class="platform-item">
+                <div class="platform-name"><%= platform.name %></div>
+                <div class="platform-count"><%= platform.count %> complaint<%= platform.count !== 1 ? 's' : '' %></div>
+              </div>
+            <% }); %>
+          </div>
+        </section>
+
+        <!-- User Evidence Section -->
+        <section class="section">
+          <h2 class="section-title">User Evidence (Most Representative)</h2>
+          <div class="quotes-list">
+            <% quotes.forEach(function(quote) { %>
+              <div class="quote-card">
+                <p class="quote-text">"<%= quote.text %>"</p>
+                <div class="quote-meta">
+                  <span class="quote-author">
+                    <%= quote.author %>
+                    <span class="quote-separator">|</span>
+                    <%= quote.category %>
+                    <span class="quote-separator">|</span>
+                    <%= quote.date %>
+                  </span>
+                  <a href="<%= quote.sourceUrl %>" class="quote-link" target="_blank" rel="noopener noreferrer">
+                    View source
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <polyline points="15 3 21 3 21 9"></polyline>
+                      <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settings-modal" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Settings</h2>
+        <button class="close-button" id="close-modal" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="settings-form">
+        <div class="form-group">
+          <label class="label" for="score-threshold">Minimum Score Threshold</label>
+          <p class="description">Only show opportunities scoring above this threshold</p>
+          <div class="slider-container">
+            <input
+              type="range"
+              id="score-threshold"
+              name="min_score_threshold"
+              min="0"
+              max="100"
+              value="<%= settings.minScoreThreshold %>"
+              class="slider"
+            >
+            <span class="slider-value" id="score-threshold-value"><%= settings.minScoreThreshold %></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="label" for="complaint-count">Minimum Complaint Count</label>
+          <p class="description">Only show opportunities with at least this many complaints</p>
+          <input
+            type="number"
+            id="complaint-count"
+            name="min_complaint_count"
+            min="1"
+            value="<%= settings.minComplaintCount %>"
+            class="input-field"
+          >
+        </div>
+
+        <div class="button-group">
+          <button type="button" class="button button-cancel" id="cancel-settings">Cancel</button>
+          <button type="submit" class="button button-save">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Idea Getter - AI-Powered Opportunity Detection from Hacker News</p>
+  </footer>
+
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

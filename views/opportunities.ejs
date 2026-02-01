@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <!-- Header with System Status -->
+  <header class="header">
+    <div class="header-container">
+      <div class="header-top">
+        <a href="/" class="header-title">Idea Getter</a>
+        <button class="settings-button" id="settings-button" aria-label="Settings">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="status-bar">
+        <span class="status-item <%= stats.lastUpdatedStale ? 'status-stale' : '' %>">
+          Last updated: <%= stats.lastUpdated %>
+        </span>
+        <span class="status-item"><%= stats.complaintsAnalyzed.toLocaleString() %> complaints analyzed</span>
+        <span class="status-item"><%= stats.opportunitiesFound %> opportunities found</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="container">
+      <!-- Controls Row -->
+      <div class="controls">
+        <h1 class="page-title">Opportunities</h1>
+        <form class="sort-form" method="GET" action="/">
+          <select name="sort" class="sort-dropdown" onchange="this.form.submit()">
+            <option value="score" <%= sort === 'score' ? 'selected' : '' %>>Sort by: Score (highest first)</option>
+            <option value="date" <%= sort === 'date' ? 'selected' : '' %>>Sort by: Date (newest first)</option>
+            <option value="count" <%= sort === 'count' ? 'selected' : '' %>>Sort by: Complaint count</option>
+          </select>
+          <input type="hidden" name="order" value="<%= order %>">
+        </form>
+      </div>
+
+      <% if (opportunities.length === 0) { %>
+        <!-- Empty State -->
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M16 16s-1.5-2-4-2-4 2-4 2"></path>
+              <line x1="9" y1="9" x2="9.01" y2="9"></line>
+              <line x1="15" y1="9" x2="15.01" y2="9"></line>
+            </svg>
+          </div>
+          <h2 class="empty-state-title">No opportunities detected yet</h2>
+          <p class="empty-state-message">
+            <% if (stats.complaintsAnalyzed > 0) { %>
+              We've analyzed <%= stats.complaintsAnalyzed.toLocaleString() %> complaints and formed <%= stats.clustersFormed %> clusters,
+              but none meet your current thresholds.
+            <% } else { %>
+              No data has been collected yet. The system will automatically collect data from Hacker News.
+            <% } %>
+          </p>
+          <button class="button button-primary" id="adjust-thresholds-btn">
+            Adjust Thresholds
+          </button>
+        </div>
+      <% } else { %>
+        <!-- Opportunity Cards -->
+        <div class="opportunity-list">
+          <% opportunities.forEach(function(opp) { %>
+            <div class="opportunity-card" data-id="<%= opp.id %>">
+              <a href="/opportunity/<%= opp.id %>" class="card-link">
+                <div class="card-header">
+                  <div class="card-content">
+                    <h2 class="problem-summary"><%= opp.summary %></h2>
+                    <div class="card-meta">
+                      <span class="score-badge">Score: <%= opp.score %></span>
+                    </div>
+                  </div>
+                  <button
+                    class="bookmark-button <%= opp.isBookmarked ? 'bookmarked' : '' %>"
+                    data-id="<%= opp.id %>"
+                    data-bookmarked="<%= opp.isBookmarked %>"
+                    aria-label="<%= opp.isBookmarked ? 'Remove bookmark' : 'Add bookmark' %>"
+                    onclick="event.preventDefault(); event.stopPropagation(); toggleBookmark('<%= opp.id %>', <%= !opp.isBookmarked %>);"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="<%= opp.isBookmarked ? 'currentColor' : 'none' %>" stroke="currentColor" stroke-width="2">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                  </button>
+                </div>
+
+                <div class="metadata">
+                  <%= opp.complaintCount %> complaints across Hacker News (<%= opp.platformsDisplay %>)
+                  <span class="metadata-divider">|</span>
+                  First seen: <%= opp.firstSeen %>
+                </div>
+
+                <% if (opp.representativeQuote) { %>
+                  <blockquote class="sample-quote">
+                    "<%= opp.representativeQuote.text %>"
+                    <cite class="quote-source">
+                      &mdash; <%= opp.representativeQuote.author %> on <%= opp.representativeQuote.category %>
+                    </cite>
+                  </blockquote>
+                <% } %>
+              </a>
+            </div>
+          <% }); %>
+        </div>
+      <% } %>
+    </div>
+  </main>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settings-modal" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Settings</h2>
+        <button class="close-button" id="close-modal" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="settings-form">
+        <div class="form-group">
+          <label class="label" for="score-threshold">Minimum Score Threshold</label>
+          <p class="description">Only show opportunities scoring above this threshold</p>
+          <div class="slider-container">
+            <input
+              type="range"
+              id="score-threshold"
+              name="min_score_threshold"
+              min="0"
+              max="100"
+              value="<%= settings.minScoreThreshold %>"
+              class="slider"
+            >
+            <span class="slider-value" id="score-threshold-value"><%= settings.minScoreThreshold %></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="label" for="complaint-count">Minimum Complaint Count</label>
+          <p class="description">Only show opportunities with at least this many complaints</p>
+          <input
+            type="number"
+            id="complaint-count"
+            name="min_complaint_count"
+            min="1"
+            value="<%= settings.minComplaintCount %>"
+            class="input-field"
+          >
+        </div>
+
+        <div class="button-group">
+          <button type="button" class="button button-cancel" id="cancel-settings">Cancel</button>
+          <button type="submit" class="button button-save">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Idea Getter - AI-Powered Opportunity Detection from Hacker News</p>
+  </footer>
+
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

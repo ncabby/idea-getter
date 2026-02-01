@@ -4,7 +4,17 @@
       "Bash(find:*)",
       "Bash(npm install:*)",
       "Bash(npm run typecheck:*)",
-      "Bash(npm run db:generate:*)"
+      "Bash(npm run db:generate:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx tsx:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nReplace Reddit scraper with Hacker News scraper\n\n- Rewrite scraper module to use HN Firebase API \\(no auth required\\)\n- Rename database column subreddit -> category\n- Update default platform from ''reddit'' to ''hackernews''\n- Remove snoowrap dependency\n- Add migration for schema changes\n- Update seed with HN categories \\(ask, show\\)\n- Update intelligence and API modules for new schema\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push)",
+      "Bash(tree:*)",
+      "Bash(npm run dev:*)",
+      "Bash(curl:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd job scheduler and daily pipeline orchestration\n\nImplements automated daily pipeline execution at 2 AM UTC using node-cron:\n- PipelineOrchestrator runs 6-step pipeline \\(scrape → detect → embed → cluster → score → cleanup\\)\n- CleanupService archives data older than 30 days\n- Missed run detection executes immediately on startup if no run today\n- Duplicate prevention via in-memory state and database checks\n- 2-hour timeout protection and graceful shutdown support\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(node --import tsx -e:*)"
     ]
   }
 }
